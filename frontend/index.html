@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Life Toolbox</title>
+  <link rel="stylesheet" href="./styles.css?v=1.0.004">
+</head>
+<body>
+  <main class="app-shell">
+    <header class="app-header">
+      <div>
+        <p class="eyebrow">TOS 7 / Offline Utilities</p>
+        <h1>生活工具箱</h1>
+        <p class="subtitle">日期、单位、健康、消费和贷款等常用工具的离线计算集合。</p>
+      </div>
+      <div id="backendBadge" class="status-badge status-checking">
+        <span class="status-dot"></span>
+        <span id="backendBadgeText">检查服务</span>
+      </div>
+    </header>
+
+    <nav class="tool-tabs" aria-label="工具列表">
+      <button class="tab is-active" type="button" data-tab="date">日期</button>
+      <button class="tab" type="button" data-tab="unit">单位</button>
+      <button class="tab" type="button" data-tab="bmi">BMI</button>
+      <button class="tab" type="button" data-tab="discount">折扣</button>
+      <button class="tab" type="button" data-tab="tip">小费</button>
+      <button class="tab" type="button" data-tab="fuel">油耗</button>
+      <button class="tab" type="button" data-tab="loan">贷款</button>
+      <button class="tab" type="button" data-tab="picker">随机选择</button>
+      <button class="tab" type="button" data-tab="password">密码</button>
+    </nav>
+
+    <section id="date" class="tool-panel is-active" aria-labelledby="date-title">
+      <div class="section-heading">
+        <div>
+          <h2 id="date-title">日期差计算</h2>
+          <p>计算计划、保修、旅行或提醒日期之间的天数。</p>
+        </div>
+      </div>
+      <div class="form-grid two">
+        <label>开始日期<input id="dateStart" type="date"></label>
+        <label>结束日期<input id="dateEnd" type="date"></label>
+      </div>
+      <button class="primary-action" type="button" data-operation="date">计算天数</button>
+      <output id="dateResult" class="result-box">等待输入</output>
+    </section>
+
+    <section id="unit" class="tool-panel" aria-labelledby="unit-title">
+      <div class="section-heading">
+        <div>
+          <h2 id="unit-title">单位换算</h2>
+          <p>支持长度和重量单位，换算在 Python 后端完成。</p>
+        </div>
+      </div>
+      <div class="form-grid three">
+        <label>数值<input id="unitValue" type="number" step="any" value="1"></label>
+        <label>从
+          <select id="unitFrom">
+            <option value="m">米</option>
+            <option value="km">千米</option>
+            <option value="cm">厘米</option>
+            <option value="in">英寸</option>
+            <option value="ft">英尺</option>
+            <option value="kg">千克</option>
+            <option value="g">克</option>
+            <option value="lb">磅</option>
+          </select>
+        </label>
+        <label>到
+          <select id="unitTo">
+            <option value="km">千米</option>
+            <option value="m">米</option>
+            <option value="cm">厘米</option>
+            <option value="in">英寸</option>
+            <option value="ft">英尺</option>
+            <option value="g">克</option>
+            <option value="kg">千克</option>
+            <option value="lb">磅</option>
+          </select>
+        </label>
+      </div>
+      <button class="primary-action" type="button" data-operation="unit">换算</button>
+      <output id="unitResult" class="result-box">等待输入</output>
+    </section>
+
+    <section id="bmi" class="tool-panel" aria-labelledby="bmi-title">
+      <div class="section-heading">
+        <div>
+          <h2 id="bmi-title">BMI 计算</h2>
+          <p>根据身高和体重计算 BMI 参考范围，不作为医疗建议。</p>
+        </div>
+      </div>
+      <div class="form-grid two">
+        <label>身高 cm<input id="heightCm" type="number" step="any" value="170"></label>
+        <label>体重 kg<input id="weightKg" type="number" step="any" value="65"></label>
+      </div>
+      <button class="primary-action" type="button" data-operation="bmi">计算 BMI</button>
+      <output id="bmiResult" class="result-box">等待输入</output>
+    </section>
+
+    <section id="discount" class="tool-panel" aria-labelledby="discount-title">
+      <div class="section-heading">
+        <div>
+          <h2 id="discount-title">折扣计算</h2>
+          <p>计算优惠金额、折后价以及含税最终价格。</p>
+        </div>
+      </div>
+      <div class="form-grid three">
+        <label>原价<input id="originalPrice" type="number" step="any" value="100"></label>
+        <label>折扣 %<input id="discountPercent" type="number" step="any" value="20"></label>
+        <label>税率 %<input id="taxPercent" type="number" step="any" value="0"></label>
+      </div>
+      <button class="primary-action" type="button" data-operation="discount">计算价格</button>
+      <output id="discountResult" class="result-box">等待输入</output>
+    </section>
+
+    <section id="tip" class="tool-panel" aria-labelledby="tip-title">
+      <div class="section-heading">
+        <div>
+          <h2 id="tip-title">小费分摊</h2>
+          <p>计算含小费总额以及每个人需要支付的金额。</p>
+        </div>
+      </div>
+      <div class="form-grid three">
+        <label>账单金额<input id="tipBill" type="number" step="any" value="120"></label>
+        <label>小费 %<input id="tipPercent" type="number" step="any" value="15"></label>
+        <label>人数<input id="tipPeople" type="number" step="1" value="2"></label>
+      </div>
+      <button class="primary-action" type="button" data-operation="tip">计算分摊</button>
+      <output id="tipResult" class="result-box">等待输入</output>
+    </section>
+
+    <section id="fuel" class="tool-panel" aria-labelledby="fuel-title">
+      <div class="section-heading">
+        <div>
+          <h2 id="fuel-title">油耗费用</h2>
+          <p>按行驶距离、百公里油耗和油价估算总费用。</p>
+        </div>
+      </div>
+      <div class="form-grid three">
+        <label>距离 km<input id="fuelDistance" type="number" step="any" value="100"></label>
+        <label>L / 100 km<input id="fuelConsumption" type="number" step="any" value="7.5"></label>
+        <label>油价 / L<input id="fuelPrice" type="number" step="any" value="8"></label>
+      </div>
+      <button class="primary-action" type="button" data-operation="fuel">计算费用</button>
+      <output id="fuelResult" class="result-box">等待输入</output>
+    </section>
+
+    <section id="loan" class="tool-panel" aria-labelledby="loan-title">
+      <div class="section-heading">
+        <div>
+          <h2 id="loan-title">贷款估算</h2>
+          <p>按照等额本息方式估算月供、总还款和总利息。</p>
+        </div>
+      </div>
+      <div class="form-grid three">
+        <label>本金<input id="loanPrincipal" type="number" step="any" value="100000"></label>
+        <label>年利率 %<input id="loanRate" type="number" step="any" value="4.5"></label>
+        <label>年限<input id="loanYears" type="number" step="any" value="10"></label>
+      </div>
+      <button class="primary-action" type="button" data-operation="loan">计算月供</button>
+      <output id="loanResult" class="result-box">等待输入</output>
+    </section>
+
+    <section id="picker" class="tool-panel" aria-labelledby="picker-title">
+      <div class="section-heading">
+        <div>
+          <h2 id="picker-title">随机选择</h2>
+          <p>每行输入一个选项，由 Python `secrets` 模块随机选择一个。</p>
+        </div>
+      </div>
+      <label>选项列表<textarea id="pickerItems" rows="8" placeholder="茶&#10;咖啡&#10;水"></textarea></label>
+      <button class="primary-action" type="button" data-operation="picker">随机选择</button>
+      <output id="pickerResult" class="result-box">等待输入</output>
+    </section>
+
+    <section id="password" class="tool-panel" aria-labelledby="password-title">
+      <div class="section-heading">
+        <div>
+          <h2 id="password-title">密码生成</h2>
+          <p>使用安全随机源生成临时密码，密码不会发送到外部网络。</p>
+        </div>
+      </div>
+      <div class="form-grid two">
+        <label>长度（4-64）<input id="passwordLength" type="number" min="4" max="64" step="1" value="16"></label>
+        <label>模式
+          <select id="passwordMode">
+            <option value="mixed">字母 + 数字 + 符号</option>
+            <option value="simple">字母 + 数字</option>
+            <option value="pin">纯数字</option>
+          </select>
+        </label>
+      </div>
+      <button class="primary-action" type="button" data-operation="password">生成密码</button>
+      <output id="passwordResult" class="result-box password-result">等待输入</output>
+    </section>
+
+    <footer class="app-footer">
+      <div>
+        <strong>运行方式</strong>
+        <p>前端通过 TOS 平台代理访问 Python Unix Socket 服务，计算不依赖互联网。</p>
+      </div>
+      <button id="checkBackend" class="secondary-action" type="button">重新检查后端</button>
+    </footer>
+  </main>
+  <script src="./app.js?v=1.0.004"></script>
+</body>
+</html>

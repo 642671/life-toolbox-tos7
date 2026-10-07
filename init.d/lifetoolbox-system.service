@@ -1,0 +1,41 @@
+[Unit]
+Description=Life Toolbox WebUI service
+After=network.target
+StartLimitBurst=5
+StartLimitIntervalSec=60
+
+[Service]
+Type=simple
+User=life-toolbox
+Group=life-toolbox
+WorkingDirectory=/usr/local/life-toolbox
+ExecStart=/usr/bin/python3 /usr/local/life-toolbox/bin/life-toolbox-service
+EnvironmentFile=-/usr/local/life-toolbox/life-toolbox.env
+TimeoutStartSec=30
+TimeoutStopSec=10
+
+# Security hardening
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictRealtime=true
+RestrictSUIDSGID=true
+LockPersonality=true
+MemoryDenyWriteExecute=true
+RestrictAddressFamilies=AF_UNIX
+
+ReadWritePaths=/usr/local/life-toolbox/data /usr/local/life-toolbox/logs /var/api
+LimitNOFILE=65536
+LimitNPROC=256
+MemoryMax=256M
+CPUQuota=50%
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

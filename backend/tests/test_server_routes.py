@@ -1,0 +1,72 @@
+from __future__ import annotations
+
+import http.client
+import json
+import sys
+import threading
+import unittest
+from pathlib import Path
+
+BACKEND_DIR = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(BACKEND_DIR))
+
+from life_toolbox import server  # noqa: E402
+
+
+class ServerRouteTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.instance = server.ThreadedTCPServer(("127.0.0.1", 0), server.LifeToolboxHandler)
+        cls.host, cls.port = cls.instance.server_address
+        cls.thread = threading.Thread(target=cls.instance.serve_forever, daemon=True)
+        cls.thread.start()
+
+    @classmethod
+    def tearDownClass(cls) -> None:
+        cls.instance.shutdown()
+        cls.thread.join(timeout=5)
+        cls.instance.server_close()
+
+    def request(self, method: str, path: str, body: dict | None = None) -> tuple[int, dict]:
+        connection = http.client.HTTPConnection(self.host, self.port, timeout=5)
+        payload = json.dumps(body) if body is not None else None
+        headers = {"Content-Type": "application/json"} if body is not None else {}
+        connection.request(method, path, body=payload, headers=headers)
+        response = connection.getresponse()
+        data = json.loads(response.read().decode("utf-8"))
+        connection.close()
+        return response.status, data
+
+    def test_health(self) -> None:
+        status, data = self.request("GET", "/v2/proxy/life-toolbox/health")
+        self.assertEqual(status, 200)
+        self.assertEqual(data["status"], "ok")
+        self.assertEqual(data["app"], "life-toolbox")
+
+    def test_loan_calculation(self) -> None:
+        status, data = self.request(
+            "POST",
+            "/v2/proxy/life-toolbox/calculate",
+            {
+                "operation": "loan",
+                "principal": 100000,
+                "annual_rate_percent": 4.5,
+                "years": 10,
+            },
+        )
+        self.assertEqual(status, 200)
+        self.assertEqual(data["result"]["months"], 120)
+        self.assertAlmostEqual(data["result"]["monthly_payment"], 1036.38, places=2)
+
+    def test_invalid_calculation_returns_400(self) -> None:
+        status, data = self.request(
+            "POST",
+            "/v2/proxy/life-toolbox/calculate",
+            {"operation": "bmi", "height_cm": 0, "weight_kg": 65},
+        )
+        self.assertEqual(status, 400)
+        self.assertFalse(data["ok"])
+
+
+if __name__ == "__main__":
+    unittest.main()

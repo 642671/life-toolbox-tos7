@@ -1,0 +1,12 @@
+Package: life-toolbox
+Version: 1.0.004
+Architecture: amd64
+Section: utils
+Priority: optional
+Maintainer: qishiyi <qishiyi77@gmail.com>
+Depends: python3 (>= 3.10), systemd
+Description: Life Toolbox WebUI application for TOS
+ Offline daily utility toolbox with date, unit, BMI,
+ discount, tip, fuel, loan, picker, and password tools.
+ The WebUI communicates with a local Python service over
+ the TOS Unix socket proxy.
