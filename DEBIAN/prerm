@@ -1,15 +1,15 @@
-#!/bin/sh
+#!/bin/bash
 set -e
 
+APP_USER="life-toolbox"
 SYSTEM_ID="lifetoolbox-system"
 
-case "$1" in
-    remove|upgrade|deconfigure)
-        if [ -d /run/systemd/system ]; then
-            systemctl stop "${SYSTEM_ID}.service" || true
-            systemctl disable "${SYSTEM_ID}.service" || true
-        fi
-        ;;
-esac
+if [ -d /run/systemd/system ]; then
+    systemctl stop "${SYSTEM_ID}.service" 2>/dev/null || true
+    systemctl disable "${SYSTEM_ID}.service" 2>/dev/null || true
+fi
+
+pkill -u "${APP_USER}" 2>/dev/null || true
+sleep 1
 
 exit 0

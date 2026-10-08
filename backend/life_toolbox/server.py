@@ -229,6 +229,23 @@ def create_server() -> ThreadedUnixHTTPServer:
     return server
 
 
+def stop_server_runtime(
+    server: ThreadedUnixHTTPServer,
+    worker: threading.Thread,
+    timeout: float = 2.0,
+) -> None:
+    """Stop the HTTP loop without letting cleanup block systemd indefinitely."""
+    shutdown_thread = threading.Thread(
+        target=server.shutdown,
+        name="http-shutdown",
+        daemon=True,
+    )
+    shutdown_thread.start()
+    shutdown_thread.join(timeout)
+    worker.join(timeout)
+    server.server_close()
+
+
 def main() -> int:
     server = create_server()
     stop_event = threading.Event()
@@ -248,11 +265,16 @@ def main() -> int:
         while not stop_event.wait(1.0):
             pass
     finally:
-        server.shutdown()
-        worker.join(timeout=5)
-        server.server_close()
-        if os.path.exists(SOCKET_PATH):
-            os.unlink(SOCKET_PATH)
+        try:
+            stop_server_runtime(server, worker)
+        except Exception as exc:  # pragma: no cover - stop path must stay best effort
+            log("ERROR", f"Service cleanup failed: {exc}")
+        finally:
+            try:
+                if os.path.exists(SOCKET_PATH):
+                    os.unlink(SOCKET_PATH)
+            except OSError as exc:  # pragma: no cover - defensive stop cleanup
+                log("WARN", f"Unable to remove socket {SOCKET_PATH}: {exc}")
         log("INFO", "Service stopped")
     return 0
 

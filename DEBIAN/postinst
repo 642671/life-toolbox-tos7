@@ -5,23 +5,48 @@ APP_ID="life-toolbox"
 APP_USER="life-toolbox"
 SYSTEM_ID="lifetoolbox-system"
 APP_DIR="/usr/local/${APP_ID}"
+WEBUI_ARCHIVE="${APP_DIR}/webui.bz2"
+WEBUI_DIR="${APP_DIR}/webui"
 UNIT_SRC="${APP_DIR}/init.d/${SYSTEM_ID}.service"
 UNIT_DST="/etc/systemd/system/${SYSTEM_ID}.service"
+APP_GROUP=""
 
 case "$1" in
     configure)
-        # The platform creates APP_USER during installation. Do not create it here.
+        # TOS creates only the application user. Resolve its primary group
+        # instead of requiring a same-named application group.
         if getent passwd "${APP_USER}" >/dev/null 2>&1; then
-            chown -R "${APP_USER}:${APP_USER}" \
-                "${APP_DIR}/data" "${APP_DIR}/logs" 2>/dev/null || true
+            APP_GROUP="$(id -gn "${APP_USER}" 2>/dev/null || true)"
+            if [ -n "${APP_GROUP}" ]; then
+                chown -R "${APP_USER}:${APP_GROUP}" \
+                    "${APP_DIR}/data" "${APP_DIR}/logs" 2>/dev/null || true
+            fi
             chmod 0750 "${APP_DIR}/data" "${APP_DIR}/logs" 2>/dev/null || true
         fi
 
-        mkdir -p /var/api
-        if getent passwd "${APP_USER}" >/dev/null 2>&1; then
-            chown "${APP_USER}:${APP_USER}" /var/api 2>/dev/null || true
+        # TOS keeps the first extracted webui directory across upgrades.
+        # Re-extract the current archive on every configure so UI changes
+        # are actually served after package upgrades.
+        if [ -f "${WEBUI_ARCHIVE}" ] && command -v tar >/dev/null 2>&1; then
+            mkdir -p "${WEBUI_DIR}"
+            tar -xjf "${WEBUI_ARCHIVE}" -C "${WEBUI_DIR}"
+            chown -R root:root "${WEBUI_DIR}" 2>/dev/null || true
+            chmod -R a+rX "${WEBUI_DIR}" 2>/dev/null || true
         fi
-        chmod 0770 /var/api 2>/dev/null || true
+
+        # /var/api is shared by all iframe applications.
+        if [ -d /var/api ]; then
+            if [ -n "${APP_GROUP}" ]; then
+                chown "root:${APP_GROUP}" /var/api 2>/dev/null || true
+            fi
+            chmod 0770 /var/api 2>/dev/null || true
+        else
+            mkdir -p /var/api
+            if [ -n "${APP_GROUP}" ]; then
+                chown "root:${APP_GROUP}" /var/api 2>/dev/null || true
+            fi
+            chmod 0770 /var/api 2>/dev/null || true
+        fi
 
         if [ -d /run/systemd/system ]; then
             ln -sf "${UNIT_SRC}" "${UNIT_DST}"

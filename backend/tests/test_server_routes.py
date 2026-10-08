@@ -38,10 +38,17 @@ class ServerRouteTests(unittest.TestCase):
         return response.status, data
 
     def test_health(self) -> None:
-        status, data = self.request("GET", "/v2/proxy/life-toolbox/health")
-        self.assertEqual(status, 200)
-        self.assertEqual(data["status"], "ok")
-        self.assertEqual(data["app"], "life-toolbox")
+        for path in (
+            "/health",
+            "/life-toolbox/health",
+            "/life-toolbox/api/health",
+            "/life-toolbox/v2/proxy/life-toolbox/health",
+            "/v2/proxy/life-toolbox/health",
+        ):
+            status, data = self.request("GET", path)
+            self.assertEqual(status, 200, path)
+            self.assertEqual(data["status"], "ok", path)
+            self.assertEqual(data["app"], "life-toolbox", path)
 
     def test_loan_calculation(self) -> None:
         status, data = self.request(
@@ -66,6 +73,34 @@ class ServerRouteTests(unittest.TestCase):
         )
         self.assertEqual(status, 400)
         self.assertFalse(data["ok"])
+
+
+class ServerShutdownTests(unittest.TestCase):
+    def test_stop_runtime_has_bounded_wait(self) -> None:
+        import time
+
+        class SlowServer:
+            def __init__(self) -> None:
+                self.closed = False
+
+            def shutdown(self) -> None:
+                time.sleep(0.3)
+
+            def server_close(self) -> None:
+                self.closed = True
+
+        class Worker:
+            def join(self, timeout: float | None = None) -> None:
+                if timeout:
+                    time.sleep(min(timeout, 0.01))
+
+        server_instance = SlowServer()
+        started = time.monotonic()
+        server.stop_server_runtime(server_instance, Worker(), timeout=0.05)
+        elapsed = time.monotonic() - started
+
+        self.assertTrue(server_instance.closed)
+        self.assertLess(elapsed, 0.25)
 
 
 if __name__ == "__main__":

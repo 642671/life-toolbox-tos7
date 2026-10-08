@@ -11,6 +11,8 @@
   --success: #17803d;
   --danger: #b42318;
   --shadow: 0 16px 40px rgba(25, 46, 44, 0.09);
+  --window-safe-top: 56px;
+  --shell-height: calc(100vh - var(--window-safe-top));
 }
 
 * {
@@ -20,10 +22,10 @@
 body {
   margin: 0;
   min-height: 100vh;
+  padding: var(--window-safe-top) 0 0;
+  overflow: hidden;
   color: var(--ink);
-  background:
-    linear-gradient(135deg, rgba(15, 118, 110, 0.08), transparent 42%),
-    var(--surface-soft);
+  background: var(--surface);
   font-family: "Segoe UI", Arial, sans-serif;
 }
 
@@ -38,14 +40,47 @@ button {
   cursor: pointer;
 }
 
-.app-shell {
-  width: min(1040px, calc(100% - 32px));
-  margin: 24px auto;
-  padding: 28px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
+.window-titlebar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  height: var(--window-safe-top);
+  padding: 0 136px 0 18px;
+  border-bottom: 1px solid var(--line);
   background: var(--surface);
-  box-shadow: var(--shadow);
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 800;
+  pointer-events: none;
+}
+
+.app-shell {
+  position: relative;
+  width: 100%;
+  height: var(--shell-height);
+  margin: 0;
+  padding: 28px 28px 44px;
+  overflow-y: auto;
+  border: 0;
+  border-radius: 0;
+  background: var(--surface);
+  box-shadow: none;
+}
+
+.app-shell::after {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  z-index: 60;
+  width: 20px;
+  height: 20px;
+  background: var(--surface);
+  content: "";
+  pointer-events: none;
 }
 
 .app-header {
@@ -290,9 +325,10 @@ textarea {
 
 @media (max-width: 760px) {
   .app-shell {
-    width: min(100% - 20px, 1040px);
-    margin: 10px auto;
-    padding: 18px;
+    width: 100%;
+    height: var(--shell-height);
+    margin: 0;
+    padding: 18px 18px 44px;
   }
 
   .app-header,

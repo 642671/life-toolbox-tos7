@@ -7,18 +7,20 @@ StartLimitIntervalSec=60
 [Service]
 Type=simple
 User=life-toolbox
-Group=life-toolbox
 WorkingDirectory=/usr/local/life-toolbox
 ExecStart=/usr/bin/python3 /usr/local/life-toolbox/bin/life-toolbox-service
+ExecStopPost=/bin/rm -f /var/api/life-toolbox.sock
 EnvironmentFile=-/usr/local/life-toolbox/life-toolbox.env
 TimeoutStartSec=30
-TimeoutStopSec=10
+TimeoutStopSec=5
+KillMode=control-group
+KillSignal=SIGTERM
+SendSIGKILL=yes
 
 # Security hardening
 NoNewPrivileges=true
 ProtectSystem=strict
 ProtectHome=true
-PrivateTmp=true
 PrivateDevices=true
 ProtectKernelTunables=true
 ProtectKernelModules=true
@@ -34,8 +36,7 @@ LimitNOFILE=65536
 LimitNPROC=256
 MemoryMax=256M
 CPUQuota=50%
-Restart=on-failure
-RestartSec=10
+Restart=no
 
 [Install]
 WantedBy=multi-user.target
