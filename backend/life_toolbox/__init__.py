@@ -1,3 +1,3 @@
 """Life Toolbox backend package."""
 
-__version__ = "1.0.006"
+__version__ = "1.0.007"

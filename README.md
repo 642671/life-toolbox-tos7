@@ -1,6 +1,6 @@
 # Life Toolbox for TOS 7
 
-这是 `life-toolbox` 的 TOS 7 单包应用源码，当前版本为 `1.0.006`。
+这是 `life-toolbox` 的 TOS 7 单包应用源码，当前版本为 `1.0.007`。
 
 应用采用 WebUI 内部打开模式，前端通过 TOS 平台代理访问本地 Python 服务：
 
@@ -48,7 +48,9 @@ life-toolbox-tos7/
 │   ├── postinst
 │   ├── prerm
 │   └── postrm
-├── docs/PROJECT_LAYOUT.md
+├── docs/
+│   ├── PROJECT_LAYOUT.md
+│   └── TOS7_SPEC_COMPLIANCE_CN.md
 ├── config.ini                     # TOS 应用元数据，内容为 JSON
 ├── life-toolbox.lang              # TOS 要求的 14 种语言
 ├── life-toolbox.env
@@ -77,6 +79,9 @@ python -m unittest discover -s backend/tests -v
 
 ## 构建
 
+对官方规范的逐条符合性、在真实 TOS 7 上的实测证据，以及三处刻意的规范偏离，
+见 [TOS 7 规范符合性说明](docs/TOS7_SPEC_COMPLIANCE_CN.md)。
+
 当前构建脚本只使用 Python 标准库，不要求本机安装 `dpkg-deb`。
 
 ```bash
@@ -93,25 +98,25 @@ Windows PowerShell 如果没有可用的 `python` 命令，可以把上面的
 生成文件：
 
 ```text
-dist/life-toolbox_1.0.006_x86_64.deb
-dist/life-toolbox_1.0.006_x86_64.deb.sha256
+dist/life-toolbox_1.0.007_x86_64.deb
+dist/life-toolbox_1.0.007_x86_64.deb.sha256
 ```
 
 也可以直接使用官方 `dpkg-deb` 验证生成结果：
 
 ```bash
-dpkg-deb --info dist/life-toolbox_1.0.006_x86_64.deb
-dpkg-deb --contents dist/life-toolbox_1.0.006_x86_64.deb
+dpkg-deb --info dist/life-toolbox_1.0.007_x86_64.deb
+dpkg-deb --contents dist/life-toolbox_1.0.007_x86_64.deb
 ```
 
 ## 安装前检查
 
-安装包会安装到 `/usr/local/life-toolbox/`，并使用 systemd 服务 `lifetoolbox-system.service`。应用用户由 TOS 平台创建；生命周期脚本不会手工创建用户。
+安装包会安装到 `/usr/local/life-toolbox/`，并使用 systemd 服务 `lifetoolbox-system.service`。应用用户正常由 TOS 平台创建；`postinst` 只在平台没有创建该用户时才补建一个同名的系统用户（不覆盖已存在的用户），避免侧载安装时服务以 `217/USER` 失败。
 
 建议按以下顺序验证：
 
 ```bash
-sudo dpkg -i life-toolbox_1.0.006_x86_64.deb
+sudo dpkg -i life-toolbox_1.0.007_x86_64.deb
 systemctl status lifetoolbox-system.service
 journalctl -u lifetoolbox-system.service -n 100 --no-pager
 ```
@@ -123,14 +128,19 @@ journalctl -u lifetoolbox-system.service -n 100 --no-pager
 1. `VERSION`
 2. `config.ini` 的 `version`
 3. `DEBIAN/control` 的 `Version`
-4. `CHANGELOG.md`
+4. `backend/life_toolbox/__init__.py` 的 `__version__`
+5. `frontend/index.html` 的 `styles.css?v=` 与 `app.js?v=`
+6. `life-toolbox.lang` 中 14 种语言的 `release_note`
+7. `CHANGELOG.md`
+
+版本号一致性由 `backend/tests/test_package_contract.py` 自动校验，漏改任何一处都会在测试和 `build.py` 阶段失败。
 
 然后提交并创建标签：
 
 ```bash
 git add .
-git commit -m "release: v1.0.006"
-git tag v1.0.006
+git commit -m "release: v1.0.007"
+git tag v1.0.007
 git push origin main --tags
 ```
 

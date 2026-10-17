@@ -2,96 +2,96 @@
 name = "生活工具箱"
 auth = "qishiyi"
 descript = "离线生活计算工具箱，包含日期、单位换算、BMI、折扣、小费、油耗、贷款、随机选择和密码生成。"
-release_note = "升级到 TOS 7 最新单包模板；后端改为 Python 3.10 模块化服务；完善 14 种语言和离线计算功能。"
+release_note = "1.0.007：服务单元按 TOS 7 实机行为加固，崩溃后可自动恢复；安装脚本不再修改共享目录 /var/api 的权限。"
 important = "BMI 和贷款结果仅供日常参考，不构成医疗或金融建议。"
 
 [zh-hk]
 name = "生活工具箱"
 auth = "qishiyi"
 descript = "離線生活計算工具箱，包含日期、單位換算、BMI、折扣、小費、油耗、貸款、隨機選擇和密碼產生。"
-release_note = "升級至 TOS 7 最新單包模板；後端改為 Python 3.10 模組化服務；完善 14 種語言和離線計算功能。"
+release_note = "1.0.007：服務單元按 TOS 7 實機行為加固，崩潰後可自動復原；安裝腳本不再修改共用目錄 /var/api 的權限。"
 important = "BMI 和貸款結果僅供日常參考，不構成醫療或金融建議。"
 
 [en-us]
 name = "Life Toolbox"
 auth = "qishiyi"
 descript = "Offline daily utility toolbox with date, unit, BMI, discount, tip, fuel, loan, picker, and password tools."
-release_note = "Updated to the latest TOS 7 single-package template; the backend is now a modular Python 3.10 service; added 14-language support and offline calculations."
+release_note = "1.0.007: hardened the systemd unit against real TOS 7 behaviour and added automatic crash recovery; the installer no longer changes permissions on the shared /var/api directory."
 important = "BMI and loan results are general estimates, not medical or financial advice."
 
 [fr-fr]
 name = "Boite a outils"
 auth = "qishiyi"
 descript = "Boite a outils hors ligne avec calculateurs de date, unites, IMC, remises, pourboires, carburant, prets, choix et mots de passe."
-release_note = "Mise a niveau vers le dernier modele TOS 7 ; backend Python 3.10 modulaire ; prise en charge de 14 langues."
+release_note = "1.0.007 : unité systemd durcie selon le comportement réel de TOS 7, avec reprise automatique après plantage ; l'installation ne modifie plus les permissions du dossier partagé /var/api."
 important = "Les resultats IMC et pret sont indicatifs et ne constituent pas un avis medical ou financier."
 
 [de-de]
 name = "Alltags-Werkzeugkasten"
 auth = "qishiyi"
 descript = "Offline-Werkzeugkasten mit Rechnern fuer Datum, Einheiten, BMI, Rabatt, Trinkgeld, Kraftstoff, Kredit, Auswahl und Passwort."
-release_note = "Aktualisierung auf die neueste TOS 7 Vorlage; modularer Python-3.10-Dienst; 14 Sprachen."
+release_note = "1.0.007: Systemd-Unit gemäß dem tatsächlichen TOS 7-Verhalten gehärtet, mit automatischer Wiederherstellung nach Absturz; der Installer ändert die Berechtigungen des gemeinsamen Verzeichnisses /var/api nicht mehr."
 important = "BMI- und Kreditwerte sind nur allgemeine Schaetzungen, keine medizinische oder finanzielle Beratung."
 
 [it-it]
 name = "Cassetta degli attrezzi"
 auth = "qishiyi"
 descript = "Cassetta degli attrezzi offline con calcolatori per date, unita, BMI, sconti, mance, carburante, prestiti, scelte e password."
-release_note = "Aggiornato all'ultimo modello TOS 7; backend Python 3.10 modulare; supporto per 14 lingue."
+release_note = "1.0.007: unit systemd rafforzata secondo il comportamento reale di TOS 7, con recupero automatico dopo arresto anomalo; l'installazione non modifica più i permessi della cartella condivisa /var/api."
 important = "I risultati BMI e prestito sono stime generali, non consulenza medica o finanziaria."
 
 [es-es]
 name = "Caja de herramientas"
 auth = "qishiyi"
 descript = "Caja de herramientas sin conexion con calculadoras de fecha, unidades, IMC, descuentos, propinas, combustible, prestamos, eleccion y contrasenas."
-release_note = "Actualizado a la ultima plantilla TOS 7; backend modular en Python 3.10; soporte para 14 idiomas."
+release_note = "1.0.007: unidad systemd endurecida según el comportamiento real de TOS 7, con recuperación automática tras fallos; la instalación ya no modifica los permisos del directorio compartido /var/api."
 important = "Los resultados de IMC y prestamos son estimaciones generales, no asesoramiento medico o financiero."
 
 [hu-hu]
 name = "Eletmod eszkozkeszlet"
 auth = "qishiyi"
 descript = "Offline eszkozkeszlet datum, egyseg, BMI, kedvezmeny, borravalo, uzemanyag, hitel, valaszto es jelszo szamitasokhoz."
-release_note = "Frissites a legujabb TOS 7 sablonra; modularis Python 3.10 backend; 14 nyelv tamogatasa."
+release_note = "1.0.007: a systemd egység a TOS 7 tényleges viselkedése szerint keményített, automatikus hibahelyreállítással; a telepítő többé nem módosítja a közös /var/api könyvtár jogosultságait."
 important = "A BMI es hitel eredmenyek altalanos becslesek, nem orvosi vagy penzugyi tanacsok."
 
 [ja-jp]
 name = "生活ツールボックス"
 auth = "qishiyi"
 descript = "日付、単位、BMI、割引、チップ、燃料、ローン、ランダム選択、パスワード生成を含むオフラインツールです。"
-release_note = "TOS 7 最新シングルパッケージテンプレートへ更新。Python 3.10 バックエンドをモジュール化。14 言語対応。"
+release_note = "1.0.007: systemd ユニットを実際の TOS 7 の挙動に合わせて強化し、クラッシュ後の自動復旧を追加しました。インストール時に共有ディレクトリ /var/api の権限を変更しなくなりました。"
 important = "BMI とローンの結果は一般的な目安であり、医療または金融アドバイスではありません。"
 
 [ko-kr]
 name = "생활 도구함"
 auth = "qishiyi"
 descript = "날짜, 단위, BMI, 할인, 팁, 연료, 대출, 무작위 선택, 비밀번호 도구를 포함한 오프라인 도구함입니다."
-release_note = "최신 TOS 7 단일 패키지 템플릿으로 업데이트했습니다. Python 3.10 모듈형 백엔드와 14개 언어를 지원합니다."
+release_note = "1.0.007: systemd 유닛을 실제 TOS 7 동작에 맞게 강화하고 충돌 후 자동 복구를 추가했습니다. 설치 중에 공유 디렉터리 /var/api의 권한을 더 이상 변경하지 않습니다."
 important = "BMI와 대출 결과는 일반적인 추정치이며 의료 또는 금융 조언이 아닙니다."
 
 [pl-pl]
 name = "Skrzynka narzedzi"
 auth = "qishiyi"
 descript = "Narzedzia offline do dat, jednostek, BMI, rabatow, napiwkow, paliwa, kredytow, losowania i hasel."
-release_note = "Aktualizacja do najnowszego szablonu TOS 7; modularny backend Python 3.10; wsparcie 14 jezykow."
+release_note = "1.0.007: jednostka systemd wzmocniona zgodnie z rzeczywistym zachowaniem TOS 7, z automatycznym przywracaniem po awarii; instalator nie zmienia już uprawnień wspólnego katalogu /var/api."
 important = "Wyniki BMI i kredytu sa ogolnymi szacunkami, a nie porada medyczna lub finansowa."
 
 [ru-ru]
 name = "Zhiznennyj nabor"
 auth = "qishiyi"
 descript = "Oflajn-instrumenty dlya dat, edinic, IMT, skidok, chaevyh, topliva, kreditov, vybora i parolya."
-release_note = "Obnovlenie do poslednego shablona TOS 7; modulnyj backend Python 3.10; podderzhka 14 yazykov."
+release_note = "1.0.007: юнит systemd усилен с учётом реального поведения TOS 7, добавлено автоматическое восстановление после сбоя; установщик больше не изменяет права общего каталога /var/api."
 important = "Rezultaty IMT i kredita yavlyayutsya obshchimi ocenkami, a ne medicinskim ili finansovym sovetom."
 
 [tr-tr]
 name = "Yasam Arac Kutusu"
 auth = "qishiyi"
 descript = "Tarih, birim, BMI, indirim, bahsis, yakit, kredi, secim ve parola araclari iceren cevrimdisi arac kutusu."
-release_note = "En son TOS 7 tek paket sablonuna guncellendi; moduler Python 3.10 arka ucu; 14 dil destegi."
+release_note = "1.0.007: systemd birimi gerçek TOS 7 davranışına göre sağlamlaştırıldı ve çökmeden otomatik kurtarma eklendi; kurulum artık paylaşılan /var/api dizininin izinlerini değiştirmiyor."
 important = "BMI ve kredi sonuclari genel tahminlerdir; tibbi veya finansal tavsiye degildir."
 
 [pt-pt]
 name = "Caixa de ferramentas"
 auth = "qishiyi"
 descript = "Caixa de ferramentas offline com data, unidades, IMC, descontos, gorjetas, combustivel, emprestimos, escolha e palavras-passe."
-release_note = "Atualizado para o modelo TOS 7 mais recente; backend modular em Python 3.10; suporte a 14 idiomas."
+release_note = "1.0.007: unidade systemd reforçada conforme o comportamento real do TOS 7, com recuperação automática após falha; a instalação já não altera as permissões da pasta partilhada /var/api."
 important = "Os resultados de IMC e emprestimo sao estimativas gerais, nao aconselhamento medico ou financeiro."
