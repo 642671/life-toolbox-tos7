@@ -95,11 +95,21 @@ button {
   gap: 16px;
   margin-bottom: 24px;
   padding: 15px 16px;
-  border: 1px solid var(--danger);
-  border-left: 4px solid var(--danger);
+  border: 1px solid var(--notice-accent, var(--danger));
+  border-left: 4px solid var(--notice-accent, var(--danger));
   border-radius: 6px;
   background: var(--surface-soft);
   color: var(--ink);
+}
+
+/*
+ * 只有 data-kind="offline"（后端真的回了错误）才是红色。network / session /
+ * gateway 是浏览器或平台把请求拦下了，用琥珀色，避免用户去重启一个本来就好的服务。
+ */
+.service-notice[data-kind="network"],
+.service-notice[data-kind="session"],
+.service-notice[data-kind="gateway"] {
+  --notice-accent: var(--accent);
 }
 
 .service-notice[hidden] {
@@ -113,7 +123,7 @@ button {
 .service-notice strong {
   display: block;
   margin-bottom: 6px;
-  color: var(--danger);
+  color: var(--notice-accent, var(--danger));
   font-size: 15px;
 }
 
@@ -224,6 +234,15 @@ h2 {
 
 .status-offline .status-dot {
   background: var(--danger);
+}
+
+/* 请求被浏览器或平台拦下时不是"后端挂了"，颜色必须区分开，否则用户会去重启一个本来就好的服务。 */
+.status-warn {
+  color: var(--accent);
+}
+
+.status-warn .status-dot {
+  background: var(--accent);
 }
 
 .tool-tabs {

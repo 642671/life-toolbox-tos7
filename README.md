@@ -1,6 +1,6 @@
 # Life Toolbox for TOS 7
 
-这是 `life-toolbox` 的 TOS 7 单包应用源码，当前版本为 `1.0.007`。
+这是 `life-toolbox` 的 TOS 7 单包应用源码，当前版本为 `1.0.009`。
 
 应用采用 WebUI 内部打开模式，前端通过 TOS 平台代理访问本地 Python 服务：
 
@@ -10,6 +10,12 @@
   -> /var/api/life-toolbox.sock
   -> Python 3.10 后端
 ```
+
+代理根不写死一种：前端按规范允许的几种形式顺序探测，用回包里的 `app` 字段确认"这确实是本应用"，
+选中后复用。请求失败时页面按四类成因分别提示——网络层被浏览器或平台拦下、TOS 会话未生效、
+平台代理没有转到本应用、后端确实返回错误——并列出实际失败的请求地址；只有最后一类才说
+"后端服务未运行"。实机上未登录时平台对任意 `/v2/...` 路径回的是 HTTP 200 +
+`{"is_login":false,"code_num":117}`，所以判据必须是回包内容而不是状态码。
 
 所有计算都在本地完成，不需要互联网连接。
 
@@ -98,15 +104,15 @@ Windows PowerShell 如果没有可用的 `python` 命令，可以把上面的
 生成文件：
 
 ```text
-dist/life-toolbox_1.0.007_x86_64.deb
-dist/life-toolbox_1.0.007_x86_64.deb.sha256
+dist/life-toolbox_1.0.009_x86_64.deb
+dist/life-toolbox_1.0.009_x86_64.deb.sha256
 ```
 
 也可以直接使用官方 `dpkg-deb` 验证生成结果：
 
 ```bash
-dpkg-deb --info dist/life-toolbox_1.0.007_x86_64.deb
-dpkg-deb --contents dist/life-toolbox_1.0.007_x86_64.deb
+dpkg-deb --info dist/life-toolbox_1.0.009_x86_64.deb
+dpkg-deb --contents dist/life-toolbox_1.0.009_x86_64.deb
 ```
 
 ## 安装前检查
@@ -116,7 +122,7 @@ dpkg-deb --contents dist/life-toolbox_1.0.007_x86_64.deb
 建议按以下顺序验证：
 
 ```bash
-sudo dpkg -i life-toolbox_1.0.007_x86_64.deb
+sudo dpkg -i life-toolbox_1.0.009_x86_64.deb
 systemctl status lifetoolbox-system.service
 journalctl -u lifetoolbox-system.service -n 100 --no-pager
 ```
@@ -139,8 +145,8 @@ journalctl -u lifetoolbox-system.service -n 100 --no-pager
 
 ```bash
 git add .
-git commit -m "release: v1.0.007"
-git tag v1.0.007
+git commit -m "release: v1.0.009"
+git tag v1.0.009
 git push origin main --tags
 ```
 

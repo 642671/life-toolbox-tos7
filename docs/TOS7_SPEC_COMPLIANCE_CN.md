@@ -121,3 +121,118 @@ dpkg 返回 0、App Center 显示已启用，页面却什么都没有。以下�
 `prerm` 的 14 秒轮询，systemd 自己会先完成强杀。实测用一个忽略 `SIGTERM` 的进程验证：
 `dpkg -r` 用时 12 秒，进程、socket、单元文件全部清除，`/var/api` 属主与模式保持
 `777 test:test` 未被改动。
+
+## 7. 请求层：四类失败与代理路由实测（1.0.009）
+
+触发这一轮改动的是页面上这句提示：
+
+```text
+后端服务未运行 …… 失败原因：无法连接后端服务：Failed to fetch
+```
+
+`Failed to fetch` 是 fetch 在网络层抛出的 `TypeError`，只说明请求没能离开浏览器或没拿到响应，
+**不能**证明后端进程没在运行。旧代码把所有异常都归为"后端没运行"，所以这句话在多数情况下是错的。
+下面先列在 `10.18.15.136`（TOS 7.0.1298）上实测到的平台行为，再说明据此重写的请求层。
+
+### 7.1 代理链路的实测结论
+
+| 位置 | 实测行为 |
+|---|---|
+| nginx | `location ~ ^/v2/(.*)` 去掉 `/v2/` 后 `proxy_pass http://127.0.0.1:5050/$1?$args`（TOSDaemon） |
+| 未登录时任意 `/v2/` 路径 | **HTTP 200** + `{"is_login":false,"code":false,"msg":"please login","data":null,"code_num":117,"code_msg":"please login"}`，包括 `/v2/proxy/一个不存在的appid/health` |
+| 不在 `/v2/` 下的路径 | nginx 404 + `text/html`（`<title>404 Not Found</title>`） |
+| `/v2/` 下不需要登录的未知接口 | TOSDaemon 404 + `text/plain`，正文 `404 page not found` |
+| 写错前缀，如 `/v2/proxy2/life-toolbox/health` | **301** 重写到 `/proxy2/life-toolbox/health/?`，然后才 404 |
+| 80 / 443 端口 | 只 `return 301` 到 8181 / 5443；两个端口的 `root` 都是 `/usr/www/`，include 同一份 extend 配置 |
+| 平台自己的 OPTIONS 预检 | 204，但 `Access-Control-Allow-Origin: same-origin` —— 非法字面值，浏览器不会接受 |
+| CSP | `default-src 'self' *.terra-master.com …`，没有 `connect-src`，同源 fetch 放行 |
+| 会话 cookie | `TMSESSNAME` 是 HttpOnly（JS 读不到），`X-Csrf-Token` 不是 |
+
+鉴权发生在路由之前，这一条决定了 `gateway` 与 `session` 的先后：未登录时无论路径写什么，
+`/v2/proxy/...` 都先被登录信封挡下，只有会话有效才会去查注册表。而 301 那一行说明状态码
+根本不能当判据——一个拼错的前缀不报错，只是安静地跳走。
+
+由此确定的判据是：**看回包内容，不看 HTTP 状态码。** 200 可能是登录信封，404 可能是 nginx 的
+HTML 或 TOSDaemon 的纯文本，301 可能是拼错的前缀，它们都不是本应用；`/health` 回包必须带
+`app == "life-toolbox"` 才算命中路由。
+
+浏览器与套接字两侧的验收（1.0.009，`10.18.15.136`）：
+
+- 套接字侧直连 `/var/api/life-toolbox.sock`：`/health`、`/api/health`、`/life-toolbox/health`、
+  `/v2/proxy/life-toolbox/health`、`/life-toolbox/api/health` 五种路径全部回同一个健康 JSON，
+  证明第 3 节的路径归一化在实机生效。
+- 套接字侧的请求头：不带 `Origin` 的同源请求没有任何 `Access-Control-*` 头；带 `Origin` 时回显该值并附
+  `Vary: Origin`；`OPTIONS` 预检回 204 且 `Access-Control-Allow-Headers` 覆盖 `Content-Type`、
+  `X-Csrf-Token`、`Cookie`。
+- 平台侧（`http://10.18.15.136:8181/probe-lt/index.html`，加载的就是发布出去的 `app.js`）：
+  未登录时页面显示"TOS 会话没有生效"而不是"后端服务未运行"——这正是旧版本误报的那一格；
+  把候选根改成 `/nope/health` 得到"平台代理没有转到本应用"，改成 `http://10.18.15.136:1`
+  得到"无法连接平台代理 …… 详情：TypeError: Failed to fetch"。
+- 因为鉴权在路由之前，`offline` 与正常回包必须在平台代理之外验证：用一次性
+  `.nas-lab/serve_webui.py`（静态服务 `webui/` 并把 `/v2/proxy/life-toolbox/<api>` 转给套接字）
+  复现平台。接上套接字时徽标 `Python 3.10.12`、提示条 `hidden`，BMI 计算真实返回
+  `BMI：22.86 / 分类：正常范围`；把输入改成 0 触发后端 400，错误只写进结果区、徽标显示"服务正常"、
+  提示条不出现；换上一律回 502 的桩，提示条变成红色"后端服务未运行"并列出 `systemctl status` 与
+  诊断文件；把桩修好后点"重试连接"，徽标回到 `Python 3.10.12`、提示条收起。
+- 需要说清楚的边界：**"会话有效时平台代理会把请求转到本应用"这一条只在套接字侧直连验证过。**
+  TOS 网页登录是 RSA 包装的，脚本无法登录，因此没有带有效会话在平台代理上跑通过一次真实请求；
+  `offline` 分型也相应地是用桩复现的，而不是在平台代理上观测到的。
+
+### 7.2 四类失败分型
+
+`apiFailure()` 给每个错误打上 `kind`，提示条按 `kind` 渲染各自的标题、正文、配色和处置建议：
+
+| kind | 触发条件 | 标题 | 提示的下一步 |
+|---|---|---|---|
+| `network` | fetch 抛异常，含 `Failed to fetch` | 无法连接平台代理 | 先显示实际失败的请求地址，再按 F12 网络面板区分：`Blocked by client` 是扩展拦的，证书不受信与沙箱来源也在这一类 |
+| `session` | 401，或回包命中登录信封 | TOS 会话没有生效 | 重新登录 TOS、确认页面是从应用中心打开的 |
+| `gateway` | 回包不是本应用 JSON（nginx HTML、`app` 字段不符、JSON 解析失败） | 平台代理没有转到本应用 | 重新探测候选路由，并把三种形式列给用户核对 |
+| `offline` | 后端 5xx | 后端服务未运行 | `systemctl status lifetoolbox-system.service` 与诊断文件绝对路径 |
+| `rejected` | 后端 4xx（401 除外） | 不弹提示条 | 只在结果区显示错误，服务状态保持"正常" |
+
+`error.serviceDown` 只在非 `rejected` 时为真，所以参数填错（后端回 400）不再拉故障横幅。
+`network` / `session` / `gateway` 三种用 `--notice-accent: var(--accent)` 显示为提醒色而不是红色，
+只有真正指向后端的 `offline` 才是红色。
+
+### 7.3 路由探测
+
+规范 8.9 把 `/v2/proxy/<appid>/<api>` 定为唯一形式，8.7 又要求后端兼容
+`/v2/proxy/<appid>/api/<resource>` 与 `<config.ini.path>/<api_name>`，个别固件确实只在带前缀的路径上
+放行代理。前端按序探测三个候选——`/v2/proxy/life-toolbox`、`/v2/proxy/life-toolbox/api`、
+`<页面目录>/v2/proxy/life-toolbox`——选中第一个回包 `app` 字段匹配的根并复用。探测只在根未就绪
+或出现 `gateway` 错误时发生，`session` 与 `network` 立即上抛，不做无谓重试。
+
+### 7.4 后端 CORS 修正
+
+旧实现取不到 `Origin` 时兜底回 `Access-Control-Allow-Origin: null`，这种头对任何请求都没有意义。
+现在 `_apply_cors()` 只在请求确实带 `Origin` 时回显该值，并同时附
+`Access-Control-Allow-Credentials: true` 与 `Vary: Origin`；同源请求不带 `Origin`，因此不再收到 CORS 头。
+`do_OPTIONS` 回 204 并放行平台那一组请求头。平台自己在预检里回 `Access-Control-Allow-Origin: same-origin`
+是非法字面值——这个错误不复制一遍。
+
+### 7.5 请求头收紧
+
+GET 不带 `Content-Type`：它是 CORS 非安全字段，会让每个只读请求先付一次预检。
+规范 8.10 要求同时带 `X-Csrf-Token` 和 `Cookie`，但 `Cookie` 在浏览器的 forbidden header name 名单里，
+fetch 里手写的那条被静默丢弃（既不报错也不发送），而真正的 `TMSESSNAME` 本身是 HttpOnly，
+JS 读出来永远是空串。会话实际由 `credentials: "include"` 携带，所以只保留真正能生效的 `X-Csrf-Token`。
+
+### 7.6 护栏
+
+`backend/tests/frontend_request_harness.cjs` 用 Node 的 `vm` 起一个带假
+`document` / `location` / `fetch` 的沙箱执行真实的 `app.js`，逐场景断言分型结果（11 个场景）。
+`backend/tests/test_frontend_request_layer.py` 跑这个 harness，再补充源码与样式连线断言：提示条的
+五个 id 与 `data-kind="offline"` 默认值、三种提醒色的 CSS 规则、`.status-warn`、"实际失败的请求地址"
+必须引用 `error.url`、禁止出现手写 `Cookie` 头、三个前端文件保持 LF 无 BOM。
+`CorsHeaderTests` 对真实 socket 发裸 HTTP 请求校验头，含"回显 `Origin` 而不是硬编码"。
+
+必须说清楚的局限：用户设备上的这一次 `Failed to fetch` 未能在 `10.18.15.136` 复现——同一请求形式在
+该机可通——而且实验机侧载安装后没有 App Center 注册（`/usr/www/life-toolbox` 缺失），页面本身无法
+由平台下发，所以原始客户端原因只能靠新版本横幅第一条"实际失败的请求地址"回到用户那边取证。
+按实机证据，这一类现象的可能原因从高到低是：浏览器扩展拦截（F12 显示 `Blocked by client`）、
+证书不受信或走了 TDM 远程 / 反向代理、会话没生效（新版会归为 `session` 而不是这一类）、
+应用未在应用中心注册（归 `gateway`）、后端真的挂了（归 `offline`）。
+已经排除的假设：8181 与 5443 两个 server 块的 `root` 同为 `/usr/www/` 并 include 同一份 extend
+配置，"页面与接口不同端口"不成立；CSP 没有 `connect-src`；GET 不带自定义头不触发预检。
+本轮可交付的价值是：应用现在能指明四类原因中的哪一类并显示实际失败的 URL，
+同时修掉三个真实缺陷（把 200 登录信封当健康、没有路由回退、措辞误导）。

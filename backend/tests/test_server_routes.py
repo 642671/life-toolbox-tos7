@@ -103,5 +103,75 @@ class ServerShutdownTests(unittest.TestCase):
         self.assertLess(elapsed, 0.25)
 
 
+class CorsHeaderTests(unittest.TestCase):
+    """预检与跨源响应头的契约。
+
+    实机（TOS 7.0.1298）上平台的 TOSDaemon 对 /v2/ 代理请求回的是字面量
+    ``Access-Control-Allow-Origin: same-origin``——那不是合法取值，任何浏览器都
+    不会认为它匹配自己的源。应用不能跟着犯同一个错，所以这里把回源头钉死：
+    有 Origin 就原样回显并带 Vary: Origin，没有 Origin 就一个 CORS 头都不发。
+    """
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.instance = server.ThreadedTCPServer(("127.0.0.1", 0), server.LifeToolboxHandler)
+        cls.host, cls.port = cls.instance.server_address
+        cls.thread = threading.Thread(target=cls.instance.serve_forever, daemon=True)
+        cls.thread.start()
+
+    @classmethod
+    def tearDownClass(cls) -> None:
+        cls.instance.shutdown()
+        cls.thread.join(timeout=5)
+        cls.instance.server_close()
+
+    def raw(self, method: str, path: str, headers: dict | None = None):
+        connection = http.client.HTTPConnection(self.host, self.port, timeout=5)
+        connection.request(method, path, headers=headers or {})
+        response = connection.getresponse()
+        status = response.status
+        got = {key.lower(): value for key, value in response.getheaders()}
+        response.read()
+        connection.close()
+        return status, got
+
+    def test_preflight_allows_the_platform_header_set(self) -> None:
+        status, got = self.raw(
+            "OPTIONS",
+            "/v2/proxy/life-toolbox/health",
+            {
+                "Origin": "https://tos.example:5443",
+                "Access-Control-Request-Method": "POST",
+                "Access-Control-Request-Headers": "content-type, x-csrf-token",
+            },
+        )
+        self.assertEqual(status, 204)
+        self.assertEqual(got.get("access-control-allow-origin"), "https://tos.example:5443")
+        self.assertEqual(got.get("access-control-allow-credentials"), "true")
+        self.assertEqual(got.get("vary"), "Origin")
+        methods = got.get("access-control-allow-methods", "")
+        for method in ("GET", "POST", "OPTIONS"):
+            self.assertIn(method, methods)
+        allowed = got.get("access-control-allow-headers", "")
+        for header in ("Content-Type", "X-Csrf-Token", "Cookie"):
+            self.assertIn(header, allowed)
+
+    def test_same_origin_request_sends_no_cors_headers(self) -> None:
+        status, got = self.raw("GET", "/health")
+        self.assertEqual(status, 200)
+        self.assertNotIn("access-control-allow-origin", got)
+        self.assertNotIn("access-control-allow-credentials", got)
+
+    def test_cors_response_origin_is_echoed_not_hardcoded(self) -> None:
+        for origin in ("https://a.example", "http://b.example:8181", "null"):
+            _status, got = self.raw("GET", "/health", {"Origin": origin})
+            self.assertEqual(got.get("access-control-allow-origin"), origin, origin)
+            self.assertNotEqual(
+                got.get("access-control-allow-origin"),
+                "same-origin",
+                "平台自己犯的错不能复制一遍",
+            )
+
+
 if __name__ == "__main__":
     unittest.main()
