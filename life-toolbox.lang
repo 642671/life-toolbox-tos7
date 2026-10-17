@@ -2,96 +2,96 @@
 name = "生活工具箱"
 auth = "qishiyi"
 descript = "离线生活计算工具箱，包含日期、单位换算、BMI、折扣、小费、油耗、贷款、随机选择和密码生成。"
-release_note = "1.0.007：服务单元按 TOS 7 实机行为加固，崩溃后可自动恢复；安装脚本不再修改共享目录 /var/api 的权限。"
+release_note = "1.0.008：安装后若服务未能启动，页面会直接说明失败原因与排查步骤，安装脚本同时生成 postinst-diagnostic.txt 诊断记录；停用与卸载会确认进程真正退出，启动前自动清理已耗尽的 systemd 重启配额。"
 important = "BMI 和贷款结果仅供日常参考，不构成医疗或金融建议。"
 
 [zh-hk]
 name = "生活工具箱"
 auth = "qishiyi"
 descript = "離線生活計算工具箱，包含日期、單位換算、BMI、折扣、小費、油耗、貸款、隨機選擇和密碼產生。"
-release_note = "1.0.007：服務單元按 TOS 7 實機行為加固，崩潰後可自動復原；安裝腳本不再修改共用目錄 /var/api 的權限。"
+release_note = "1.0.008：安裝後若服務未能啟動，頁面會直接說明失敗原因與排查步驟，安裝腳本同時生成 postinst-diagnostic.txt 診斷記錄；停用與解除安裝會確認程序真正結束，啟動前自動清理已耗盡的 systemd 重新啟動配額。"
 important = "BMI 和貸款結果僅供日常參考，不構成醫療或金融建議。"
 
 [en-us]
 name = "Life Toolbox"
 auth = "qishiyi"
 descript = "Offline daily utility toolbox with date, unit, BMI, discount, tip, fuel, loan, picker, and password tools."
-release_note = "1.0.007: hardened the systemd unit against real TOS 7 behaviour and added automatic crash recovery; the installer no longer changes permissions on the shared /var/api directory."
+release_note = "1.0.008: if the service never starts after install, the page now states the reason and the fix steps and the installer writes postinst-diagnostic.txt; disable and uninstall verify the process really exits, and an exhausted systemd restart quota is cleared before starting."
 important = "BMI and loan results are general estimates, not medical or financial advice."
 
 [fr-fr]
 name = "Boite a outils"
 auth = "qishiyi"
 descript = "Boite a outils hors ligne avec calculateurs de date, unites, IMC, remises, pourboires, carburant, prets, choix et mots de passe."
-release_note = "1.0.007 : unité systemd durcie selon le comportement réel de TOS 7, avec reprise automatique après plantage ; l'installation ne modifie plus les permissions du dossier partagé /var/api."
+release_note = "1.0.008 : si le service ne démarre pas après l'installation, la page indique désormais le motif et les étapes de réparation, et l'installation écrit postinst-diagnostic.txt ; désactivation et désinstallation vérifient la vraie fin du processus et le quota de redémarrages systemd épuisé est remis à zéro avant le démarrage."
 important = "Les resultats IMC et pret sont indicatifs et ne constituent pas un avis medical ou financier."
 
 [de-de]
 name = "Alltags-Werkzeugkasten"
 auth = "qishiyi"
 descript = "Offline-Werkzeugkasten mit Rechnern fuer Datum, Einheiten, BMI, Rabatt, Trinkgeld, Kraftstoff, Kredit, Auswahl und Passwort."
-release_note = "1.0.007: Systemd-Unit gemäß dem tatsächlichen TOS 7-Verhalten gehärtet, mit automatischer Wiederherstellung nach Absturz; der Installer ändert die Berechtigungen des gemeinsamen Verzeichnisses /var/api nicht mehr."
+release_note = "1.0.008: Startet der Dienst nach der Installation nicht, nennt die Seite jetzt Grund und Schritte zur Behebung, und das Installationsskript schreibt postinst-diagnostic.txt; Deaktivieren und Deinstallieren prüfen das tatsächliche Beenden des Prozesses, vor dem Start wird ein erschöpftes systemd-Neustartkontingent zurückgesetzt."
 important = "BMI- und Kreditwerte sind nur allgemeine Schaetzungen, keine medizinische oder finanzielle Beratung."
 
 [it-it]
 name = "Cassetta degli attrezzi"
 auth = "qishiyi"
 descript = "Cassetta degli attrezzi offline con calcolatori per date, unita, BMI, sconti, mance, carburante, prestiti, scelte e password."
-release_note = "1.0.007: unit systemd rafforzata secondo il comportamento reale di TOS 7, con recupero automatico dopo arresto anomalo; l'installazione non modifica più i permessi della cartella condivisa /var/api."
+release_note = "1.0.008: se il servizio non si avvia dopo l'installazione, la pagina ora indica motivo e passaggi di correzione e lo script di installazione scrive postinst-diagnostic.txt; disattivazione e disinstallazione verificano che il processo termini davvero e il quota di riavvii systemd esaurito viene azzerato prima dell'avvio."
 important = "I risultati BMI e prestito sono stime generali, non consulenza medica o finanziaria."
 
 [es-es]
 name = "Caja de herramientas"
 auth = "qishiyi"
 descript = "Caja de herramientas sin conexion con calculadoras de fecha, unidades, IMC, descuentos, propinas, combustible, prestamos, eleccion y contrasenas."
-release_note = "1.0.007: unidad systemd endurecida según el comportamiento real de TOS 7, con recuperación automática tras fallos; la instalación ya no modifica los permisos del directorio compartido /var/api."
+release_note = "1.0.008: si el servicio no se inicia tras la instalación, la página ahora indica el motivo y los pasos de solución y el script de instalación genera postinst-diagnostic.txt; desactivar y desinstalar comprueban que el proceso finalice de verdad y se limpia el cupo agotado de reinicios de systemd antes de arrancar."
 important = "Los resultados de IMC y prestamos son estimaciones generales, no asesoramiento medico o financiero."
 
 [hu-hu]
 name = "Eletmod eszkozkeszlet"
 auth = "qishiyi"
 descript = "Offline eszkozkeszlet datum, egyseg, BMI, kedvezmeny, borravalo, uzemanyag, hitel, valaszto es jelszo szamitasokhoz."
-release_note = "1.0.007: a systemd egység a TOS 7 tényleges viselkedése szerint keményített, automatikus hibahelyreállítással; a telepítő többé nem módosítja a közös /var/api könyvtár jogosultságait."
+release_note = "1.0.008: ha a szolgáltatás a telepítés után nem indul el, a oldal most megadja az okot és a javítási lépéseket, a telepítő szkript pedig postinst-diagnostic.txt fájlt ír; a letiltás és az eltávolítás ellenőrzi, hogy a folyamat valóban véget ért-e, és indulás előtt törli a kimerült systemd újraindítási keretet."
 important = "A BMI es hitel eredmenyek altalanos becslesek, nem orvosi vagy penzugyi tanacsok."
 
 [ja-jp]
 name = "生活ツールボックス"
 auth = "qishiyi"
 descript = "日付、単位、BMI、割引、チップ、燃料、ローン、ランダム選択、パスワード生成を含むオフラインツールです。"
-release_note = "1.0.007: systemd ユニットを実際の TOS 7 の挙動に合わせて強化し、クラッシュ後の自動復旧を追加しました。インストール時に共有ディレクトリ /var/api の権限を変更しなくなりました。"
+release_note = "1.0.008: インストール後にサービスが起動しない場合、ページが理由と対処手順を表示し、インストールスクリプトが postinst-diagnostic.txt を書き出します。無効化とアンインストールではプロセスが実際に終了したかを確認し、起動前に枯渇した systemd 再起動クレジットをリセットします。"
 important = "BMI とローンの結果は一般的な目安であり、医療または金融アドバイスではありません。"
 
 [ko-kr]
 name = "생활 도구함"
 auth = "qishiyi"
 descript = "날짜, 단위, BMI, 할인, 팁, 연료, 대출, 무작위 선택, 비밀번호 도구를 포함한 오프라인 도구함입니다."
-release_note = "1.0.007: systemd 유닛을 실제 TOS 7 동작에 맞게 강화하고 충돌 후 자동 복구를 추가했습니다. 설치 중에 공유 디렉터리 /var/api의 권한을 더 이상 변경하지 않습니다."
+release_note = "1.0.008: 설치 후 서비스가 시작되지 않으면 페이지가 원인과 조치 단계를 표시하고 설치 스크립트가 postinst-diagnostic.txt를 작성합니다. 비활성화와 제거 시 프로세스가 실제로 종료됐는지 확인하며, 시작 전에 소진된 systemd 재시작 횟수를 초기화합니다."
 important = "BMI와 대출 결과는 일반적인 추정치이며 의료 또는 금융 조언이 아닙니다."
 
 [pl-pl]
 name = "Skrzynka narzedzi"
 auth = "qishiyi"
 descript = "Narzedzia offline do dat, jednostek, BMI, rabatow, napiwkow, paliwa, kredytow, losowania i hasel."
-release_note = "1.0.007: jednostka systemd wzmocniona zgodnie z rzeczywistym zachowaniem TOS 7, z automatycznym przywracaniem po awarii; instalator nie zmienia już uprawnień wspólnego katalogu /var/api."
+release_note = "1.0.008: jeśli usługa nie uruchomi się po instalacji, strona podaje teraz przyczynę i kroki naprawy, a skrypt instalacyjny zapisuje postinst-diagnostic.txt; wyłączenie i odinstalowanie sprawdzają, czy proces faktycznie się zakończył, a przed startem czyszczony jest wyczerpany limit ponownych uruchomień systemd."
 important = "Wyniki BMI i kredytu sa ogolnymi szacunkami, a nie porada medyczna lub finansowa."
 
 [ru-ru]
 name = "Zhiznennyj nabor"
 auth = "qishiyi"
 descript = "Oflajn-instrumenty dlya dat, edinic, IMT, skidok, chaevyh, topliva, kreditov, vybora i parolya."
-release_note = "1.0.007: юнит systemd усилен с учётом реального поведения TOS 7, добавлено автоматическое восстановление после сбоя; установщик больше не изменяет права общего каталога /var/api."
+release_note = "1.0.008: если служба не запустилась после установки, страница теперь указывает причину и шаги устранения, а установщик создаёт postinst-diagnostic.txt; отключение и удаление проверяют, что процесс действительно завершился, а перед запуском сбрасывается исчерпанный лимит перезапусков systemd."
 important = "Rezultaty IMT i kredita yavlyayutsya obshchimi ocenkami, a ne medicinskim ili finansovym sovetom."
 
 [tr-tr]
 name = "Yasam Arac Kutusu"
 auth = "qishiyi"
 descript = "Tarih, birim, BMI, indirim, bahsis, yakit, kredi, secim ve parola araclari iceren cevrimdisi arac kutusu."
-release_note = "1.0.007: systemd birimi gerçek TOS 7 davranışına göre sağlamlaştırıldı ve çökmeden otomatik kurtarma eklendi; kurulum artık paylaşılan /var/api dizininin izinlerini değiştirmiyor."
+release_note = "1.0.008: hizmet kurulumdan sonra başlatılamazsa sayfa artık nedeni ve onarım adımlarını gösterir, kurulum betiği postinst-diagnostic.txt yazar; devre dışı bırakma ve kaldırma işleminde sürecin gerçekten sona erdiği doğrulanır ve başlatmadan önce tükenen systemd yeniden başlatma kotası sıfırlanır."
 important = "BMI ve kredi sonuclari genel tahminlerdir; tibbi veya finansal tavsiye degildir."
 
 [pt-pt]
 name = "Caixa de ferramentas"
 auth = "qishiyi"
 descript = "Caixa de ferramentas offline com data, unidades, IMC, descontos, gorjetas, combustivel, emprestimos, escolha e palavras-passe."
-release_note = "1.0.007: unidade systemd reforçada conforme o comportamento real do TOS 7, com recuperação automática após falha; a instalação já não altera as permissões da pasta partilhada /var/api."
+release_note = "1.0.008: se o serviço não arrancar após a instalação, a página indica agora o motivo e os passos de correção e o script de instalação escreve postinst-diagnostic.txt; desativar e desinstalar verificam se o processo terminou realmente e a quota de reinícios do systemd esgotada é limpa antes do arranque."
 important = "Os resultados de IMC e emprestimo sao estimativas gerais, nao aconselhamento medico ou financeiro."

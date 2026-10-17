@@ -83,6 +83,69 @@ button {
   pointer-events: none;
 }
 
+/*
+ * In-flow alert placed inside .app-shell, not a fixed overlay: the shell owns
+ * the scroll area, the 56px host title bar stays free, and the 20x20
+ * bottom-right resize-safe corner (.app-shell::after) is never covered.
+ */
+.service-notice {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding: 15px 16px;
+  border: 1px solid var(--danger);
+  border-left: 4px solid var(--danger);
+  border-radius: 6px;
+  background: var(--surface-soft);
+  color: var(--ink);
+}
+
+.service-notice[hidden] {
+  display: none;
+}
+
+.service-notice-body {
+  min-width: 0;
+}
+
+.service-notice strong {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--danger);
+  font-size: 15px;
+}
+
+.service-notice p {
+  margin-bottom: 8px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.service-notice ol {
+  margin: 0;
+  padding-left: 20px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.service-notice code {
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: #ffffff;
+  color: var(--ink);
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 12px;
+  word-break: break-all;
+}
+
+.service-notice .secondary-action {
+  flex: 0 0 auto;
+}
+
 .app-header {
   display: flex;
   align-items: flex-start;

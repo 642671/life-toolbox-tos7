@@ -45,17 +45,28 @@ function platformHeaders() {
 }
 
 async function apiRequest(endpoint, payload) {
-  var response = await fetch(API_ROOT + "/" + endpoint, {
-    method: payload ? "POST" : "GET",
-    credentials: "include",
-    headers: platformHeaders(),
-    body: payload ? JSON.stringify(payload) : undefined
-  });
+  var response;
+  try {
+    response = await fetch(API_ROOT + "/" + endpoint, {
+      method: payload ? "POST" : "GET",
+      credentials: "include",
+      headers: platformHeaders(),
+      body: payload ? JSON.stringify(payload) : undefined
+    });
+  } catch (error) {
+    var networkError = new Error("无法连接后端服务：" + error.message);
+    networkError.serviceDown = true;
+    throw networkError;
+  }
+  var unparsable = false;
   var data = await response.json().catch(function () {
+    unparsable = true;
     return { ok: false, error: "服务返回了无法解析的数据" };
   });
   if (!response.ok || data.ok === false) {
-    throw new Error(data.error || "请求失败，状态码 " + response.status);
+    var requestError = new Error(data.error || "请求失败，状态码 " + response.status);
+    requestError.serviceDown = unparsable || response.status >= 500;
+    throw requestError;
   }
   return data;
 }
@@ -66,13 +77,36 @@ function setBackendState(state, text) {
   byId("backendBadgeText").textContent = text;
 }
 
+var serviceNoticeDefaultReason = null;
+
+function setServiceNotice(visible, reason) {
+  var notice = byId("serviceNotice");
+  var text = byId("serviceNoticeReason");
+  if (!notice || !text) {
+    return;
+  }
+  if (serviceNoticeDefaultReason === null) {
+    serviceNoticeDefaultReason = text.textContent;
+  }
+  if (!visible) {
+    notice.hidden = true;
+    return;
+  }
+  text.textContent = reason
+    ? serviceNoticeDefaultReason + " 失败原因：" + reason
+    : serviceNoticeDefaultReason;
+  notice.hidden = false;
+}
+
 async function checkBackend() {
   setBackendState("checking", "检查服务");
   try {
     var data = await apiRequest("health");
     setBackendState("online", "Python " + data.python);
+    setServiceNotice(false);
   } catch (error) {
     setBackendState("offline", "后端不可用");
+    setServiceNotice(true, error && error.message ? error.message : String(error));
   }
 }
 
@@ -234,6 +268,9 @@ function bindEvents() {
       } catch (error) {
         showResult(resultId, "错误：" + error.message);
         setBackendState("offline", "计算失败");
+        if (error.serviceDown) {
+          setServiceNotice(true, error.message);
+        }
       } finally {
         button.disabled = false;
       }
@@ -241,6 +278,10 @@ function bindEvents() {
   });
 
   byId("checkBackend").addEventListener("click", checkBackend);
+  byId("serviceNoticeRetry").addEventListener("click", function () {
+    setServiceNotice(false);
+    checkBackend();
+  });
 }
 
 document.addEventListener("DOMContentLoaded", function () {
